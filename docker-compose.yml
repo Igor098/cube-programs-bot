@@ -1,0 +1,10 @@
+services:
+  bot-redis:
+    image: redis:latest
+    restart: always
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - ${REDIS_PORT}:6379
+    command: >
+      sh -c "redis-server --requirepass $REDIS_PASSWORD"
