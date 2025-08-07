@@ -1,0 +1,81 @@
+venv/
+.venv/
+.env
+.vscode/
+.idea/
+__pycache__/
+
+.DS_Store
+
+# Directories
+
+dist/
+build/
+
+# Files
+
+*~
+*.pyc
+*.pyo
+
+# PyInstaller
+# -----------
+# A temporary file used by PyInstaller to store information
+# about the build.
+.spec
+
+# pip
+# ---
+# Metadata about the build.
+pip-wheel-metadata
+
+# Sphinx
+# ------
+# Directory for temporary Sphinx files.
+.doctrees
+
+# pytest
+# ------
+# Directory for temporary pytest files.
+.pytest_cache
+
+# Coverage.py
+# -----------
+# Directory for temporary coverage files.
+.coverage
+
+# flake8
+# ------
+# Directory for temporary flake8 files.
+.flake8
+
+# mypy
+# ----
+# Directory for temporary mypy files.
+.mypy
+
+# isort
+# -----
+# Directory for temporary isort files.
+.isort
+
+# black
+# ----
+# Directory for temporary black files.
+.black
+
+# pre-commit
+# ----------
+# Directory for temporary pre-commit files.
+.git
+
+# pytest-cov
+# ----------
+# Directory for temporary pytest-cov files.
+.pytest-cov
+
+# pytest-xdist
+# ----------
+# Directory for temporary pytest-xdist files.
+.pytest-xdist
+

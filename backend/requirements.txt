@@ -1,0 +1,12 @@
+fastapi>=0.116.1
+redis>=6.3.0
+SQLAlchemy>=2.0.42
+pydantic-settings>=2.10.1
+loguru>=0.7.3
+passlib>=1.7.4
+python-jose>=3.5.0
+pydantic>=2.11.7
+starlette>=0.47.2
+uvicorn>=0.35.0
+alembic>=1.16.4
+aiosqlite>=0.21.0
