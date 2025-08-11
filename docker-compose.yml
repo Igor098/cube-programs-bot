@@ -8,17 +8,3 @@ services:
       - ${REDIS_PORT}:6379
     command: >
       sh -c "redis-server --requirepass $REDIS_PASSWORD"
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    restart: always
-    env_file:
-      - ./backend/.env
-    ports:
-      - ${BACKEND_PORT}:8000
-    command: >
-      sh -c "uvicorn app.main:application --host 0.0.0.0 --port 8000 --reload"
-    depends_on:
-      - bot-redis

@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, Security
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from depends.session_dep import get_session_with_commit
-from depends.token_dep import get_current_bot_admin
-from exceptions.business import ConflictError, NotFoundError
-from exceptions.http import ConflictException, NotFoundException
-from models.admin import Admin
-from schemas.program import ProgramCreateSchema, ProgramUpdateSchema
-from services.program_service import ProgramService
+from app.depends.session_dep import get_session_with_commit
+from app.depends.token_dep import get_current_bot_admin
+from app.exceptions.business import ConflictError, NotFoundError
+from app.exceptions.http import ConflictException, NotFoundException
+from app.models.admin import Admin
+from app.schemas.program import ProgramCreateSchema, ProgramUpdateSchema
+from app.services.program_service import ProgramService
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 bearer_scheme = HTTPBearer()
@@ -19,7 +19,7 @@ def get_program_service(session: AsyncSession = Depends(get_session_with_commit)
     return ProgramService(session)
 
 
-@router.post("/",)
+@router.post("/program",)
 async def create_program(
         program: ProgramCreateSchema,
         program_service: ProgramService = Depends(get_program_service),
@@ -32,7 +32,7 @@ async def create_program(
         raise ConflictException(detail=str(e))
 
 
-@router.put("/{program_id}")
+@router.put("/program/{program_id}")
 async def update_program(
         program_id: int,
         program: ProgramUpdateSchema,
@@ -46,7 +46,7 @@ async def update_program(
         raise NotFoundException(detail=str(e))
 
 
-@router.patch("/{program_id}")
+@router.patch("/program/{program_id}")
 async def partial_update_program(
         program_id: int,
         program: ProgramUpdateSchema,
@@ -60,7 +60,7 @@ async def partial_update_program(
         raise NotFoundException(detail=str(e))
 
 
-@router.delete("/{program_id}")
+@router.delete("/program/{program_id}")
 async def delete_program(
         program_id: int,
         program_service: ProgramService = Depends(get_program_service),

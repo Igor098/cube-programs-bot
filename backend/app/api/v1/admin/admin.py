@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from depends.redis_dep import get_redis
-from depends.session_dep import get_session_with_commit
-from depends.token_dep import get_current_admin
-from exceptions.business import NotFoundError, ConflictError
-from exceptions.http import NotFoundException, ConflictException
-from models.admin import Admin
-from schemas.admin import AdminCreateSchema, AdminSchema, AdminLoginSchema
-from services.admin_service import AdminService
+from app.depends.redis_dep import get_redis
+from app.depends.session_dep import get_session_with_commit
+from app.depends.token_dep import get_current_admin
+from app.exceptions.business import NotFoundError, ConflictError
+from app.exceptions.http import NotFoundException, ConflictException
+from app.models.admin import Admin
+from app.schemas.admin import AdminCreateSchema, AdminSchema, AdminLoginSchema
+from app.services.admin_service import AdminService
 from fastapi.responses import Response
 from fastapi.requests import Request
 

@@ -1,5 +1,5 @@
-from crud.base import BaseDAO
-from models.program import Program
+from app.crud.base import BaseDAO
+from app.models.program import Program
 
 
 class ProgramDAO(BaseDAO):
