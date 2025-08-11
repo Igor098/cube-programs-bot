@@ -1,19 +1,21 @@
-from fastapi import APIRouter, Depends, Security
+from fastapi import APIRouter, Depends, HTTPException, Security, logger
 from fastapi.requests import Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
-from app.core.token_types import TokenType
-from app.depends.redis_dep import get_redis
-from app.depends.session_dep import get_session_with_commit
-from app.depends.token_dep import get_current_bot_admin
-from app.exceptions.business import ConflictError, NotFoundError
-from app.exceptions.http import ConflictException, NotFoundException
-from app.models import Admin
-from app.schemas.admin import AdminCreateSchema, AdminTelegramSchema, AdminSchema
-from app.services.admin_service import AdminService
+from core.config import settings
+from core.token_types import TokenType
+from depends.redis_dep import get_redis
+from depends.session_dep import get_session_with_commit
+from depends.token_dep import get_current_bot_admin
+from exceptions.business import ConflictError, NotFoundError
+from exceptions.http import ConflictException, NotFoundException
+from models import Admin
+from schemas.admin import AdminCreateSchema, AdminTelegramSchema, AdminSchema
+from services.admin_service import AdminService
+
+from loguru import logger
 
 router = APIRouter(prefix="/v1/bot/admin", tags=["Администрирование через бота"])
 
@@ -57,13 +59,10 @@ async def login(
         redis: Redis = Depends(get_redis),
         admin_service: AdminService = Depends(get_admin_service)
 ) -> AdminTelegramSchema:
-    try:
-        await admin_service.get_admin_by_telegram_id(telegram_id)
-        token = await admin_service.bot_login(redis, telegram_id)
+    await admin_service.get_admin_by_telegram_id(telegram_id)
+    token = await admin_service.bot_login(redis, telegram_id)
 
-        return AdminTelegramSchema(access_token=token, token_type=TokenType.BOT, expires_in=settings.BOT_TTL)
-    except NotFoundError as e:
-        raise NotFoundException(detail=str(e))
+    return AdminTelegramSchema(access_token=token, token_type=TokenType.BOT, expires_in=settings.BOT_TTL)
 
 
 @router.post("/logout")

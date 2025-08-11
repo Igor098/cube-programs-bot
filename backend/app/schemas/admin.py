@@ -3,8 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.core.error_messages import INCORRECT_PASSWORD, INCORRECT_USERNAME
-from app.core.regexps import PASSWORD_REGEX, USERNAME_REGEX
+from core.error_messages import INCORRECT_PASSWORD, INCORRECT_USERNAME
+from core.regexps import PASSWORD_REGEX, USERNAME_REGEX
 
 
 class AdminCreateSchema(BaseModel):

@@ -6,11 +6,11 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 
-from app.core.error_messages import TOKEN_NOT_VALID
-from app.core.token_types import TokenType
+from core.error_messages import TOKEN_NOT_VALID
+from core.token_types import TokenType
 
-from app.core.config import settings
-from app.exceptions.business import TokenNotValidError
+from core.config import settings
+from exceptions.business import TokenNotValidError
 
 from fastapi.responses import Response
 

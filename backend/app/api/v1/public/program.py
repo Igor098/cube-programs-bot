@@ -3,11 +3,11 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.depends.session_dep import get_session_with_commit
-from app.exceptions.business import NotFoundError
-from app.exceptions.http import NotFoundException
-from app.schemas.program import ProgramSchema
-from app.services.program_service import ProgramService
+from depends.session_dep import get_session_with_commit
+from exceptions.business import NotFoundError
+from exceptions.http import NotFoundException
+from schemas.program import ProgramSchema
+from services.program_service import ProgramService
 
 router = APIRouter(prefix="/v1", tags=["Программы"])
 
