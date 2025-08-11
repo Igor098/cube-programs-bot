@@ -5,7 +5,7 @@ from sqlalchemy import select, func, update as sqlalchemy_update, delete as sqla
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.base import Base
+from database.base import Base
 from loguru import logger
 
 T = TypeVar("T", bound=Base)

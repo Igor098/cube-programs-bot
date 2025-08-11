@@ -1,9 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.error_messages import PROGRAM_ALREADY_EXISTS, PROGRAM_NOT_FOUND
-from app.crud.program import ProgramDAO
-from app.exceptions.business import NotFoundError, ConflictError
-from app.schemas.program import ProgramCreateSchema, ProgramFilter, ProgramUpdateSchema
+from core.error_messages import PROGRAM_ALREADY_EXISTS, PROGRAM_NOT_FOUND
+from crud.program import ProgramDAO
+from exceptions.business import NotFoundError, ConflictError
+from schemas.program import ProgramCreateSchema, ProgramFilter, ProgramUpdateSchema
 from loguru import logger
 
 

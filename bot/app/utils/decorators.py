@@ -1,13 +1,12 @@
 from functools import wraps
-import httpx
+from typing import Any, Awaitable, Callable
+
+from aiohttp import ClientSession, ClientTimeout
 from config import settings
 
-def with_http_client(func):
+def with_aiohttp_session(func: Callable[..., Awaitable[Any]]):
     @wraps(func)
     async def wrapper(*args, **kwargs):
-        async with httpx.AsyncClient(
-            base_url=settings.API_URL,
-            timeout=10.0,
-        ) as client:
-            return await func(*args, client=client, **kwargs)
+        async with ClientSession(base_url=settings.API_URL, timeout=ClientTimeout(total=10)) as session:
+            return await func(*args, session=session, **kwargs)
     return wrapper

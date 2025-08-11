@@ -1,6 +1,8 @@
 from typing import Optional
 
-from pydantic import Field, BaseModel, HttpUrl, model_validator
+from pydantic import Field, BaseModel, HttpUrl, field_validator, model_validator
+
+from core.enums import ProgramCategory, ProgramLevel
 
 
 class ProgramCreateSchema(BaseModel):
@@ -8,13 +10,13 @@ class ProgramCreateSchema(BaseModel):
                       description="В данное поле вводится название программы",
                       examples=["Программирование роботов", "Системное администрирование"])
 
-    description: Optional[str] = Field(None, max_length=512, title="Описание программы",
+    description: Optional[str] = Field(None, max_length=1000, title="Описание программы",
                                        description="В данное поле вводится описание программы")
 
     min_age: int = Field(..., ge=5, le=13, title="Минимальный возраст",
                          description="В данное поле вводится минимальный возраст", examples=[6, 12])
 
-    max_age: int = Field(..., ge=8, le=18, title="Максимальный возраст",
+    max_age: int = Field(..., ge=6, le=18, title="Максимальный возраст",
                          description="В данное поле вводится максимальный возраст", examples=[11, 18])
 
     navigator_link: HttpUrl = Field(..., max_length=512, title="Ссылка на навигатор",
@@ -35,6 +37,16 @@ class ProgramCreateSchema(BaseModel):
         if min_age and max_age and min_age > max_age:
             raise ValueError('min_age не может быть больше max_age')
         return values
+    
+    @model_validator(mode='before')
+    def check_values(cls, values):
+        print("values >>>", values)
+        return values
+    
+    @field_validator("requirements", "image_url", mode="before")
+    @classmethod
+    def empty_to_none(cls, v):
+        return None if v == "" else v
 
     model_config = {
         "json_schema_extra": {
@@ -53,7 +65,7 @@ class ProgramCreateSchema(BaseModel):
                     "image_url": "https://www.google.com",
                 }
             ]
-        }
+        },
     }
 
 
@@ -62,13 +74,13 @@ class ProgramUpdateSchema(BaseModel):
                                 description="В данное поле вводится название программы",
                                 examples=["Программирование роботов", "Системное администрирование"])
 
-    description: Optional[str] = Field(default=None, max_length=512, title="Описание программы",
+    description: Optional[str] = Field(default=None, max_length=1000, title="Описание программы",
                                        description="В данное поле вводится описание программы")
 
     min_age: Optional[int] = Field(default=None, ge=5, le=13, title="Минимальный возраст",
                                    description="В данное поле вводится минимальный возраст", examples=[6, 12])
 
-    max_age: Optional[int] = Field(default=None, ge=8, le=18, title="Максимальный возраст",
+    max_age: Optional[int] = Field(default=None, ge=6, le=18, title="Максимальный возраст",
                                    description="В данное поле вводится максимальный возраст", examples=[11, 18])
 
     navigator_link: Optional[HttpUrl] = Field(default=None, max_length=512, title="Ссылка на навигатор",
@@ -127,7 +139,11 @@ class ProgramSchema(BaseModel):
                       description="Данное поле содержит название программы",
                       examples=["Программирование роботов", "Системное администрирование"])
 
-    description: Optional[str] = Field(None, max_length=512, title="Описание программы",
+    short_name: Optional[str] = Field(None, max_length=34, title="Краткое название программы",
+                                       description="Данное поле содержит краткое название программы",
+                                       examples=["Python", "Системное администрирование"])
+
+    description: Optional[str] = Field(None, max_length=1000, title="Описание программы",
                                        description="Данное поле содержит описание программы",
                                        examples=["В процессе обучения по программе Lego SPIKE Prime обучающиеся "
                                                  "научатся конструированию и навыкам начального программированию "
@@ -141,9 +157,17 @@ class ProgramSchema(BaseModel):
                          description="Данное поле содержит минимальный возраст",
                          examples=[6, 12])
 
-    max_age: int = Field(..., ge=8, le=18, title="Максимальный возраст",
+    max_age: int = Field(..., ge=6, le=18, title="Максимальный возраст",
                          description="Данное поле содержит максимальный возраст",
                          examples=[11, 18])
+
+    program_level: ProgramLevel | None = Field(None, title="Уровень программы",
+                                                   description="Данное поле содержит уровень программы",
+                                                   examples=[ProgramLevel.START, ProgramLevel.ADVANCED])
+
+    category: str | None = Field(None, title="Категория программы",
+                                                 description="Данное поле содержит категорию программы",
+                                                 examples=[ProgramCategory.DESIGN, ProgramCategory.PROGRAMMING])
 
     navigator_link: HttpUrl = Field(..., max_length=512, title="Ссылка на навигатор",
                                     description="Данное поле содержит ссылку на навигатор",
@@ -161,7 +185,8 @@ class ProgramSchema(BaseModel):
                             examples=[True, False])
 
     model_config = {
-        "from_attributes": True
+        "from_attributes": True,
+        "use_enum_values": True
     }
 
 

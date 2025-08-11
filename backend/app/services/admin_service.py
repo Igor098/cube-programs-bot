@@ -6,16 +6,16 @@ from redis import RedisError
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
-from app.core.error_messages import ADMIN_NOT_FOUND, ADMIN_ALREADY_EXISTS, ADMIN_TELEGRAM_ID_ALREADY_EXISTS, \
+from core.config import settings
+from core.error_messages import ADMIN_NOT_FOUND, ADMIN_ALREADY_EXISTS, ADMIN_TELEGRAM_ID_ALREADY_EXISTS, \
     INCORRECT_CREDENTIALS, TOKEN_NOT_VALID
-from app.core.security import create_bot_token, hash_element, verify, create_access_token, create_refresh_token, \
+from core.security import create_bot_token, hash_element, verify, create_access_token, create_refresh_token, \
     create_csrf_token, set_cookie, decode_token
-from app.core.token_types import TokenType
-from app.crud.admin import AdminDAO
-from app.exceptions.business import ConflictError, NotFoundError, UnauthorizedError, TokenNotValidError
-from app.models.admin import Admin
-from app.schemas.admin import AdminFilter, AdminCreateSchema, AdminLoginSchema
+from core.token_types import TokenType
+from crud.admin import AdminDAO
+from exceptions.business import ConflictError, NotFoundError, UnauthorizedError, TokenNotValidError
+from models.admin import Admin
+from schemas.admin import AdminFilter, AdminCreateSchema, AdminLoginSchema
 from loguru import logger
 
 
