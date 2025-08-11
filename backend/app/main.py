@@ -6,7 +6,7 @@ from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
-from api.v1 import program_router, admin_programs_router, bot_program_router, bot_admin_router, admin_router
+from api.v1 import program_router, admin_programs_router, bot_program_router, bot_admin_router, admin_router, file_router
 
 application = FastAPI()
 application.include_router(program_router)
@@ -14,6 +14,7 @@ application.include_router(admin_router)
 application.include_router(admin_programs_router)
 application.include_router(bot_program_router)
 application.include_router(bot_admin_router)
+application.include_router(file_router)
 
 
 

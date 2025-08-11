@@ -10,9 +10,13 @@ class ActionFilter(BaseFilter):
     def __init__(self, action: str):
         self.action = action
 
-    async def __call__(self, c: CallbackQuery) -> bool:
+    async def __call__(self, call: CallbackQuery) -> bool:
+        data = call.data or ""
+        if "|" not in data:
+            return False
         try:
-            payload = CallbackPayload.parse(c.data)
+            payload = CallbackPayload.parse(data)
         except InvalidCallbackPayload:
             return False
+        
         return payload.action == self.action

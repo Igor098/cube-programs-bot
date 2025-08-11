@@ -1,12 +1,12 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from utils.callback_data import encode_list, encode_detail
+from utils.callback_data import encode_enroll, encode_list, encode_detail
 from utils.formatters import format_program_line
 
 def _chunk(items, n):
     for i in range(0, len(items), n):
         yield items[i:i+n]
 
-def build_programs_keyboard(items, page, pages, ver, cols: int = 1) -> InlineKeyboardMarkup:
+def build_programs_kb(items, page, pages, ver, cols: int = 1) -> InlineKeyboardMarkup:
     rows = []
 
     for row_items in _chunk(items, cols):
@@ -28,9 +28,22 @@ def build_programs_keyboard(items, page, pages, ver, cols: int = 1) -> InlineKey
 
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
-def build_detail_kb(page: int, ver: int, program_id: int, navigator_link: str | None) -> InlineKeyboardMarkup:
-    rows = [[InlineKeyboardButton(text="⬅️ Назад", callback_data=encode_list(page, ver))]]
+
+def build_open_programs_kb(version: int) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📋 Открыть список программ", callback_data=encode_list(0, version))]
+    ])
+
+
+def build_detail_kb(
+    page: int,
+    ver: int,
+    program_id: int,
+    navigator_link: str | None,
+    back_cb: str | None = None,
+) -> InlineKeyboardMarkup:
+    rows = [[InlineKeyboardButton(text="⬅️ Назад", callback_data=back_cb or encode_list(page, ver))]]
     if navigator_link:
-        rows.append([InlineKeyboardButton(text="📎 Записаться", url=navigator_link)])
+        rows.append([InlineKeyboardButton(text="📋 Записаться", callback_data=encode_enroll(page, program_id, ver))])
     rows.append([InlineKeyboardButton(text="🔄 Обновить", callback_data=encode_detail(page, program_id, ver))])
     return InlineKeyboardMarkup(inline_keyboard=rows)

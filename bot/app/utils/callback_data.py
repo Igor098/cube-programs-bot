@@ -18,12 +18,13 @@ class CallbackPayload:
             raise InvalidCallbackPayload("Пустая или слишком длинная строка")
 
         parts = raw.split("|")
+        print("parts: ", parts)
         if len(parts) != 4:
             raise InvalidCallbackPayload("Неверное количество частей")
 
         action, page_str, id_str, ver_str = parts
 
-        if action not in {"p", "d"}:
+        if action not in {"list", "detail", "enroll"}:
             raise InvalidCallbackPayload("Неизвестное действие")
 
         # Парсинг версии
@@ -35,7 +36,7 @@ class CallbackPayload:
             raise InvalidCallbackPayload("Версия должна быть положительным числом")
 
         # Для списка
-        if action == "p":
+        if action == "list":
             if id_str != "-":
                 raise InvalidCallbackPayload("В режиме списка id должен быть '-'")
             try:
@@ -47,7 +48,20 @@ class CallbackPayload:
             return cls(action=action, page=page, program_id=None, version=version)
 
         # Для деталей
-        elif action == "d":
+        elif action == "detail":
+            try:
+                program_id = int(id_str)
+                page = int(page_str)
+                if page < 0:
+                    raise ValueError
+                if program_id < 1:
+                    raise ValueError
+            except ValueError:
+                raise InvalidCallbackPayload("Неверный id программы")
+            return cls(action=action, page=page, program_id=program_id, version=version)
+        
+        # Для записи
+        elif action == "enroll":
             try:
                 program_id = int(id_str)
                 page = int(page_str)
@@ -60,7 +74,17 @@ class CallbackPayload:
             return cls(action=action, page=page, program_id=program_id, version=version)
 
 def encode_list(page, ver):
-    return f"p|{page}|-|{ver}"
+    print(f"list encode: {page}, {ver}")
+    return f"list|{page}|-|{ver}"
 
 def encode_detail(page, program_id, ver):
-    return f"d|{page}|{program_id}|{ver}"
+    print(f"detail encode: {page}, {program_id}, {ver}")
+    return f"detail|{page}|{program_id}|{ver}"
+
+def encode_enroll(page: int, program_id: int, version: int) -> str:
+    print(f"enroll encode: {page}, {program_id}, {version}")
+    return f"enroll|{page}|{program_id}|{version}"
+
+def encode_pick(age: int, version: int) -> str:
+    print(f"enroll encode: {age}, {version}")
+    return f"pick|age|{age}|{version}"

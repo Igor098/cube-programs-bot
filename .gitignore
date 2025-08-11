@@ -5,6 +5,9 @@ backend/.env
 .idea/
 __pycache__/
 
+.env
+./.env
+
 .DS_Store
 
 # Directories

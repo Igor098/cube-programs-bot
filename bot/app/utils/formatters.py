@@ -1,6 +1,6 @@
-from typing import List, Tuple
 from html import escape as _escape
 from models import ProgramWithId
+from config import settings
 
 
 def _clamp(text: str, max_len: int) -> str:
@@ -48,6 +48,39 @@ def build_list_message(total: int, page: int, pages: int) -> str:
 
     return start_text
 
+def build_enroll_message(p: ProgramWithId) -> str:
+    """
+    Формирует текстовое сообщение для записи на программу.
+    """
+    navigator_link = getattr(p, "navigator_link", None) or getattr(settings, "NAVIGATOR_LINK", None)
+    navigator_link = _escape(navigator_link)  
+
+    return (
+        "Для того, чтобы записаться вам нужно:\n"
+        f"1️⃣ Отправить заявку в навигаторе: "
+        f"<a href=\"{navigator_link}\">перейти в навигатор</a>\n"
+        "2️⃣ Заполнить бланк заявления (файл ниже)\n\n"
+        "Заполнить бланк можно как самостоятельно, так и прийти к нам.\n"
+        f"🏢 Адрес: {_escape(settings.ORGANIZATION_ADDRESS)}\n"
+        f"🕒 График работы: {_escape(settings.WORK_SHEDULE)}"
+    )
+    
+
+def build_enroll_question_message():
+    return (
+        "<b>Хотите записаться на программу?</b> Это просто!\n\n"
+        "1️⃣ Нажмите «<b>Список программ</b>» (кнопка ниже) и выберите подходящий курс.\n"
+        "2️⃣ В карточке выбранной программы нажмите «<b>Записаться</b>» и следуйте инструкции."
+    )
+    
+
+def build_pick_age_intro_html() -> str:
+    return (
+        "<b>Подберём программу по возрасту</b> 🧭\n\n"
+        "Нажмите кнопку с вашим возрастом ниже — покажем только подходящие программы.\n\n"
+    )
+    
+    
 def format_program_caption_html(p: ProgramWithId) -> str:
     """
     Короткий caption для фото (лимит у Telegram около 1024 символов).

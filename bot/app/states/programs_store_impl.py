@@ -26,6 +26,15 @@ class ProgramStore:
     async def get_program_by_id(self, program_id: int) -> ProgramWithId | None:
         async with self._lock:
             return self._by_id.get(program_id, None)
+    
+    async def get_programs_by_age(self, age: int):
+        result = []
+        pages = await self.page_count()
+        for i in range(pages):
+            for p in await self.get_page(i):
+                if getattr(p, "is_active", True) and getattr(p, "min_age", 0) <= age <= getattr(p, "max_age", 99):
+                    result.append(p)
+        return result
 
     async def add_program(self, program: ProgramWithId) -> None:
         async with self._lock:

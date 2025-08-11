@@ -1,13 +1,21 @@
 from aiogram import F
 from loguru import logger
+from keyboards.pick_age import kb_pick_age
+from keyboards.programs_by_age import build_programs_age_kb, build_programs_age_manage_kb
+from states.pick_age import PickAge
+from services.file_service import get_enroll_blank
 from filters.callback_action import ActionFilter
-from keyboards.program import build_detail_kb, build_programs_keyboard
-from utils.formatters import build_list_message, format_program_caption_html
+from keyboards.program import build_detail_kb, build_open_programs_kb, build_programs_kb
+from utils.formatters import build_enroll_message, build_enroll_question_message, build_list_message, build_pick_age_intro_html, format_program_caption_html
 from states.programs_store_impl import ProgramStore
-from utils.callback_data import CallbackPayload, InvalidCallbackPayload, encode_list
+from utils.callback_data import CallbackPayload, InvalidCallbackPayload
 from aiogram.types import Message, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
+from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramBadRequest
 from html import escape as html_escape
+
+from config import settings
 
 from aiogram import Router
 
@@ -22,8 +30,6 @@ def _same_markup(a, b) -> bool:
 
     return a.model_dump(exclude_none=True) == b.model_dump(exclude_none=True)
 
-
-from aiogram.exceptions import TelegramBadRequest
 
 async def _edit_text_or_replace(call, text: str, kb):
     """
@@ -69,12 +75,39 @@ async def handle_show_programs(message: Message, store: ProgramStore):
     items = await store.get_page(page)
 
     start_text = build_list_message(total, page, pages)
-    kb = build_programs_keyboard(items, page, pages, ver, cols=1)
+    kb = build_programs_kb(items, page, pages, ver, cols=1)
 
     await message.answer(start_text, parse_mode="HTML", reply_markup=kb)
     
 
-@router.callback_query(ActionFilter("p"))
+@router.message(F.text.contains("Как записаться"))
+async def handle_enroll_question(message: Message, store: ProgramStore):
+    version = await store.get_version()
+    text = build_enroll_question_message()
+    kb = build_open_programs_kb(version)
+
+    await message.answer(
+        text,
+        parse_mode="HTML",
+        reply_markup=kb,
+        disable_web_page_preview=True
+        )
+    
+    
+@router.message(F.text.contains("Подобрать программу"))
+async def handle_enroll_question(message: Message):
+    text = build_pick_age_intro_html()
+    kb = kb_pick_age()
+
+    await message.answer(
+        text,
+        parse_mode="HTML",
+        reply_markup=kb,
+        disable_web_page_preview=True
+        )
+    
+
+@router.callback_query(ActionFilter("list"))
 async def on_cb(call: CallbackQuery, store: ProgramStore):
     try:
         logger.info(f"Разбор колбэка списка: {call.data}")
@@ -93,7 +126,7 @@ async def on_cb(call: CallbackQuery, store: ProgramStore):
         total = await store.count()
         pages = await store.page_count()
         new_text = build_list_message(total, page, pages)
-        new_kb = build_programs_keyboard(items, page, pages, current, cols=1)
+        new_kb = build_programs_kb(items, page, pages, current, cols=1)
 
         if (call.message.html_text or call.message.text) == new_text:
             try:
@@ -109,13 +142,13 @@ async def on_cb(call: CallbackQuery, store: ProgramStore):
                 await call.answer("Уже актуально")
         return
 
-    if payload.action == "p":
+    if payload.action == "list":
         items = await store.get_page(page)
         total = await store.count()
         pages = await store.page_count()
 
         new_text = build_list_message(total, page, pages)
-        new_kb = build_programs_keyboard(items, page, pages, current, cols=1)
+        new_kb = build_programs_kb(items, page, pages, current, cols=1)
 
         old_text = call.message.html_text or call.message.text
         old_kb = call.message.reply_markup
@@ -133,15 +166,15 @@ async def on_cb(call: CallbackQuery, store: ProgramStore):
                 raise
 
 
-
-@router.callback_query(ActionFilter("d"))
-async def on_detail(call: CallbackQuery, store: ProgramStore):
+@router.callback_query(ActionFilter("detail"))
+async def on_detail(call: CallbackQuery, state: FSMContext, store: ProgramStore):
     try:
+        logger.info(f"Разбор колбэка деталей: {call.data}")
         payload = CallbackPayload.parse(call.data)
     except InvalidCallbackPayload:
         await call.answer("Кнопка устарела или повреждена", show_alert=True)
         return
-    if payload.action != "d":
+    if payload.action != "detail":
         return
 
     current = await store.get_version()
@@ -153,7 +186,7 @@ async def on_detail(call: CallbackQuery, store: ProgramStore):
         total = await store.count()
         pages = await store.page_count()
         start_text = build_list_message(total, page, pages)
-        kb = build_programs_keyboard(items, page, pages, current)  # твой билдер
+        kb = build_programs_kb(items, page, pages, current)
         try:
             await _edit_text_or_replace(call, start_text, kb)
         except TelegramBadRequest:
@@ -166,11 +199,19 @@ async def on_detail(call: CallbackQuery, store: ProgramStore):
         total = await store.count()
         pages = await store.page_count()
         start_text = build_list_message(total, page, pages)
-        kb = build_programs_keyboard(items, page, pages, current)
+        kb = build_programs_kb(items, page, pages, current)
         await _edit_text_or_replace(call, start_text, kb)
         return
+    
+    back_cb = None
+    cur_state = await state.get_state()
+    if cur_state == PickAge.results:
+        data = await state.get_data()
+        age = data.get("age_filter")
+        if isinstance(age, int):
+            back_cb = f"pick:return:{age}"
 
-    kb = build_detail_kb(page, current, p.id, getattr(p, "navigator_link", None))
+    kb = build_detail_kb(page, current, p.id, getattr(p, "navigator_link", None), back_cb=back_cb)
 
     try:
         await call.message.delete()
@@ -201,3 +242,112 @@ async def on_detail(call: CallbackQuery, store: ProgramStore):
         reply_markup=kb,
         disable_notification=True,
     )
+    
+
+@router.callback_query(ActionFilter("enroll"))
+async def on_enroll(call: CallbackQuery, store: ProgramStore):
+    try:
+        logger.info(f"Разбор колбэка записи: {call.data}")
+        payload = CallbackPayload.parse(call.data)
+    except InvalidCallbackPayload:
+        await call.answer("Кнопка устарела или повреждена", show_alert=True)
+        return
+
+    program = await store.get_program_by_id(payload.program_id)
+    if not program:
+        await call.answer("Программа не найдена", show_alert=True)
+        return
+
+    text = build_enroll_message(p=program)
+
+    await call.message.answer(text, parse_mode="HTML",   disable_web_page_preview=True)
+
+    file = await get_enroll_blank()
+    
+    await call.message.answer_document(file)
+    await call.answer()
+    
+
+@router.callback_query(F.data.regexp(r"^pick:age:\d{1,2}$"))
+async def on_pick_age(call: CallbackQuery, state: FSMContext, store: ProgramStore):
+    logger.info(f"Разбор колбэка возраста: {call.data}")
+    age = int(call.data.rsplit(":", 1)[-1])
+    await state.update_data(age_filter=age)
+    await state.set_state(PickAge.results)
+    ver = await store.get_version()
+
+    items = await store.get_programs_by_age(age)
+    
+    if items:
+        kb = build_programs_age_kb(items=items, version=ver)
+        text = f"Подходящих программ: <b>{len(items)}</b>. Выберите нужную:"
+    else:
+        kb = build_programs_age_manage_kb(version=ver)
+        text = ("По выбранному возрасту пока нет подходящих программ.\n"
+                "Попробуйте другой возраст или откройте весь список.")
+
+    try:
+        await _edit_text_or_replace(call, text, kb)
+    except TelegramBadRequest as e:
+        if "message is not modified" not in str(e).lower():
+            raise
+    await call.answer()
+
+
+@router.callback_query(F.data == "pick:again")
+async def on_pick_again(call: CallbackQuery):
+    from keyboards.pick_age import kb_pick_age
+    try:
+        text = "<b>Подберём программу по возрасту</b>.\n\nВыберите подходящий возраст:"
+        kb = kb_pick_age()
+        await _edit_text_or_replace(call,text,kb)
+    except TelegramBadRequest:
+        await call.message.answer(
+            "<b>Подберём программу по возрасту</b>.\n\nВыберите подходящий возраст:",
+            parse_mode="HTML",
+            reply_markup=kb_pick_age(),
+            disable_notification=True,
+        )
+    await call.answer()
+
+
+@router.callback_query(F.data == "pick:cancel")
+async def on_pick_cancel(call: CallbackQuery):
+    try:
+        await call.message.delete()
+    except TelegramBadRequest:
+        pass
+    await call.answer("Подбор отменён")
+        
+        
+@router.callback_query(F.data.startswith("pick:return:"))
+async def on_pick_return(call: CallbackQuery, state: FSMContext, store: ProgramStore):
+    try:
+        age = int(call.data.rsplit(":", 1)[-1])
+    except ValueError:
+        await call.answer("Возраст не распознан", show_alert=True)
+        return
+
+    await state.update_data(age_filter=age)
+    await state.set_state(PickAge.results)
+
+    ver = await store.get_version()
+    items = await store.get_programs_by_age(age)
+
+    if items:
+        kb = build_programs_age_kb(items, ver)
+        text = f"Подходящих программ: <b>{len(items)}</b>. Выберите нужную:"
+    else:
+        kb = build_programs_age_manage_kb(version=ver)
+        text = ("По выбранному возрасту пока нет подходящих программ.\n"
+                "Попробуйте другой возраст или откройте весь список.")
+
+    try:
+        await _edit_text_or_replace(call, text, kb)
+    except TelegramBadRequest:
+        try:
+            await call.message.delete()
+        except TelegramBadRequest:
+            pass
+        await call.message.answer(text, parse_mode="HTML", reply_markup=kb, disable_notification=True)
+    await call.answer()
