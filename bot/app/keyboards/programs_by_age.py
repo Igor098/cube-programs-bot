@@ -1,5 +1,6 @@
+from math import ceil
 from typing import List, TypeAlias
-from utils.callback_data import encode_detail, encode_list
+from utils.callback_data import encode_detail, encode_list, encode_pick_page
 from models import ProgramWithId
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -25,17 +26,34 @@ def build_programs_age_manage_kb(version: int) -> InlineKeyboardMarkup:
 
 def build_programs_age_kb(
     items: List[ProgramWithId],
+    age: int,
+    page: int,
     version: int,
     limit: int = AGE_RESULTS_LIMIT,
-    page_for_detail: int = 0
 ) -> InlineKeyboardMarkup:
-    rows = []
-    for p in items[:limit]:
+    total = len(items)
+    pages = max(1, ceil(total / limit))
+    page = max(0, min(page, pages - 1))
+
+    start = page * limit
+    slice_ = items[start:start+limit]
+
+    rows: list[list[InlineKeyboardButton]] = []
+    for p in slice_:
         title = _short(getattr(p, "name", f"Программа #{p.id}"))
-        rows.append([InlineKeyboardButton(text=title, callback_data=encode_detail(page_for_detail, p.id, version))])
-    
-    manage_kb = build_programs_age_manage_rows(version=version)
-    rows.extend(manage_kb)
-    
+        rows.append([InlineKeyboardButton(text=title, callback_data=encode_detail(page, p.id, version))])
+
+    # Навигация
+    nav: list[InlineKeyboardButton] = []
+    if page > 0:
+        nav.append(InlineKeyboardButton(text="⬅️ Назад", callback_data=encode_pick_page(age, page - 1, version)))
+    nav.append(InlineKeyboardButton(text=f"🔄 {page+1}/{pages}", callback_data=encode_pick_page(age, page, version)))
+    if page < pages - 1:
+        nav.append(InlineKeyboardButton(text="➡️ Далее", callback_data=encode_pick_page(age, page + 1, version)))
+    rows.append(nav)
+
+    # Общие действия
+    rows.extend(build_programs_age_manage_rows(version))
+
     return InlineKeyboardMarkup(inline_keyboard=rows)
 

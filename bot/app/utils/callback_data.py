@@ -88,3 +88,9 @@ def encode_enroll(page: int, program_id: int, version: int) -> str:
 def encode_pick(age: int, version: int) -> str:
     print(f"enroll encode: {age}, {version}")
     return f"pick|age|{age}|{version}"
+
+def encode_pick_page(age: int, page: int, ver: int) -> str:
+    return f"pick:page:{age}:{page}:{ver}"
+
+def encode_pick_return(age: int, page: int) -> str:
+    return f"pick:return:{age}:{page}"

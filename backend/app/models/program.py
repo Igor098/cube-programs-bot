@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import CheckConstraint, Enum, String, Integer, Text, Boolean
-
-from core.enums import ProgramCategory, ProgramLevel
+from sqlalchemy import CheckConstraint, String, Integer, Text, Boolean
+from core.enums import ProgramCategory
 from database.base import Base
 
 
