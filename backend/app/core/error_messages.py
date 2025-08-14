@@ -22,3 +22,7 @@ TOKEN_NOT_FOUND = "Токен не найден"
 CSRF_NOT_FOUND = "CSRF токен не найден"
 
 CSRF_NOT_VALID = "CSRF токен не действителен"
+
+GROUP_ALREADY_EXISTS = "Такая группа уже существует"
+
+GROUP_NOT_FOUND = "Группа не найдена"

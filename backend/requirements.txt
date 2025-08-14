@@ -9,4 +9,4 @@ pydantic>=2.11.7
 starlette>=0.47.2
 uvicorn>=0.35.0
 alembic>=1.16.4
-aiosqlite>=0.21.0
+asyncpg>=0.30.0

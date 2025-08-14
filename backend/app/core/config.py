@@ -28,8 +28,6 @@ class Settings(BaseSettings):
     )
 
     def get_database_url(self):
-        if self.MODE == "development":
-            return f"sqlite+aiosqlite:///app/database/db.sqlite3"
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 

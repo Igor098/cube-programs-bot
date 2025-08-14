@@ -15,7 +15,7 @@ class ProgramService:
         programs = await self._program_dao.find_all()
         if not programs:
             logger.warning("Программы не найдены")
-            raise NotFoundError(PROGRAM_NOT_FOUND)
+            return []
 
         return programs
 

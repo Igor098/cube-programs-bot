@@ -4,13 +4,15 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.security import ReplayError, TwaVerificationError, assert_not_replayed, verify_init_data
+from app.schemas.twa import TwaAuthIn
 from core.config import settings
 from core.token_types import TokenType
 from depends.redis_dep import get_redis
 from depends.session_dep import get_session_with_commit
 from depends.token_dep import get_current_bot_admin
 from exceptions.business import ConflictError, NotFoundError
-from exceptions.http import ConflictException, NotFoundException
+from exceptions.http import ConflictException, NotFoundException, UnauthorizedException
 from models import Admin
 from schemas.admin import AdminCreateSchema, AdminTelegramSchema, AdminSchema
 from services.admin_service import AdminService
@@ -52,6 +54,37 @@ async def register(
     except ConflictError as e:
         raise ConflictException(detail=str(e))
 
+
+@router.post("/twa", response_model=AdminTelegramSchema)
+async def auth_twa(
+    body: TwaAuthIn,
+    redis: Redis = Depends(get_redis),
+    admin_service: AdminService = Depends(get_admin_service),
+) -> AdminTelegramSchema:
+    # 1) Проверка подписи/TTL
+    try:
+        verified = verify_init_data(body.init_data, settings.BOT_TOKEN, max_age_sec=300)
+    except TwaVerificationError:
+        raise UnauthorizedException(detail="Некорректные данные Telegrams")
+
+    marker = verified.query_id or verified.hash
+    try:
+        await assert_not_replayed(redis, marker, ttl=300)
+    except ReplayError:
+        raise UnauthorizedException(detail="Replay detected")
+
+    try:
+        await admin_service.get_admin_by_telegram_id(verified.telegram_id)
+    except Exception:
+        raise UnauthorizedException(detail="Forbidden")
+
+    token = await admin_service.bot_login(redis, verified.telegram_id)
+
+    return AdminTelegramSchema(
+        access_token=token,
+        token_type=TokenType.BOT,
+        expires_in=settings.BOT_TTL,
+    )
 
 @router.post("/login")
 async def login(
