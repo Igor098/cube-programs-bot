@@ -4,7 +4,7 @@ from aiogram.client.default import DefaultBotProperties
 from services.programs_sync import sync_programs_from_api
 from config import settings
 from loguru import logger
-from handlers import common_router, programs_router, authentication_router
+from handlers import common_router, programs_router
 from states.programs_store import store
 
 
@@ -20,7 +20,7 @@ async def on_startup(bot: Bot):
 async def main():
     dp = Dispatcher()
     dp.startup.register(on_startup)
-    dp.include_routers(common_router, programs_router, authentication_router)
+    dp.include_routers(common_router, programs_router)
 
     token = settings.TOKEN
     bot = Bot(token=token, default=DefaultBotProperties(parse_mode='HTML'))

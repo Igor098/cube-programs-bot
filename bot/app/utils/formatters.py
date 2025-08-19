@@ -1,6 +1,8 @@
 from html import escape as _escape
+from states.weekday import WEEKDAY
 from models import ProgramWithId
 from config import settings
+from loguru import logger
 
 
 def _clamp(text: str, max_len: int) -> str:
@@ -82,11 +84,7 @@ def build_pick_age_intro_html() -> str:
     
     
 def format_program_caption_html(p: ProgramWithId) -> str:
-    """
-    Короткий caption для фото (лимит у Telegram около 1024 символов).
-    Оставим запас ~900.
-    """
-    name = f"<strong>{_escape(p.short_name or p.name or "")}</strong>\n"
+    name = f"{_escape(p.short_name or p.name or "")}\n"
     level = _escape(p.program_level or "")
     age = f"{p.min_age} – {p.max_age}" if p.min_age and p.max_age else "—"
 
@@ -94,15 +92,54 @@ def format_program_caption_html(p: ProgramWithId) -> str:
     desc = _escape(desc)
 
     requirements = _escape(p.requirements or "")
+    
+    logger.info(f"Program: {p}")
+    
+    groups = getattr(p, "groups", []) or []
+    logger.info(f"Groups: {groups}")
+    group_lines = []
+    groups = getattr(p, "groups", []) or []
+    if not groups:
+        group_lines.append("  —")
+        return "\n".join(group_lines)
 
-    head = f"<b>{name}</b>"
+    groups_sorted = sorted(groups, key=lambda g: (getattr(g, "name", "") or "").lower())
+
+    for g in groups_sorted:
+        gname = getattr(g, "name", "") or ""
+        group_lines.append(f"\n  👩‍💻 <b>{gname}:</b>")
+        slots = getattr(g, "time_slots", []) or []
+
+        def _slot_key(s):
+            w = getattr(s, "weekday", None)
+            st = getattr(s, "start_time", None)
+            return (w or 99, st)
+
+        seen = set()
+        for s in sorted(slots, key=_slot_key):
+            w = getattr(s, "weekday", None)
+            wd = WEEKDAY.get(w)
+            st = getattr(s, "start_time", None)
+            en = getattr(s, "end_time", None)
+            if not (wd and st and en):
+                continue
+            row = f"    — {wd} {st.strftime('%H:%M')} - {en.strftime('%H:%M')}"
+            if row not in seen:
+                group_lines.append(row)
+                seen.add(row)
+
+    head = f"<strong>{name}</strong>"
     age = f"📈 Возраст: <i>{age} лет</i>"
     requirements = f"\n📋 Дополнительные требования: <i>{requirements if requirements else 'Нет'}</i>"
-
-    if not level:
-        parts = [head, age, "", desc, requirements]
-    else:
-        level = f"🎓 Уровень: <i>{level}</i>"
-        parts = [head, level, age, "", desc, requirements]
+    level = f"🎓 Уровень: <i>{level}</i>" if level else None
+    schedule_line = f"\n📅 График занятий:\n{'\n'.join(group_lines)}" if group_lines else None
+        
+    parts = [head]
+    if level: parts.append(level)
+    parts.append(age)
+    parts.append("")
+    parts.append(desc)
+    if schedule_line: parts.append(schedule_line)
+    parts.append(requirements)
 
     return "\n".join(parts)

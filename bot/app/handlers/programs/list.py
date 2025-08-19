@@ -14,7 +14,6 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
-from html import escape as html_escape
 
 from aiogram import Router
 
@@ -60,7 +59,7 @@ async def _edit_text_or_replace(call, text: str, kb):
 
 
 @router.message(F.text.contains("Список программ"))
-async def handle_show_programs(message: Message, store: ProgramStore):
+async def handle_show_programs(message: Message, store: ProgramStore, state: FSMContext):
     logger.info("Запрос списка программ")
 
     ver = await store.get_version()
@@ -71,6 +70,7 @@ async def handle_show_programs(message: Message, store: ProgramStore):
     logger.info(f"Страниц: {pages}")
     page = 0
     logger.info(f"Текущая страница: {page}")
+    await state.clear()
     
     items = await store.get_page(page)
 
@@ -81,10 +81,12 @@ async def handle_show_programs(message: Message, store: ProgramStore):
     
 
 @router.message(F.text.contains("Как записаться"))
-async def handle_enroll_question(message: Message, store: ProgramStore):
+async def handle_enroll_question(message: Message, store: ProgramStore, state: FSMContext):
     version = await store.get_version()
     text = build_enroll_question_message()
     kb = build_open_programs_kb(version)
+    
+    await state.clear()
 
     await message.answer(
         text,
@@ -95,9 +97,11 @@ async def handle_enroll_question(message: Message, store: ProgramStore):
     
     
 @router.message(F.text.contains("Подобрать программу"))
-async def handle_enroll_question(message: Message):
+async def handle_enroll_question(message: Message, state: FSMContext):
     text = build_pick_age_intro_html()
     kb = kb_pick_age()
+    
+    await state.clear()
 
     await message.answer(
         text,
@@ -328,8 +332,9 @@ async def on_pick_again(call: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == "pick:cancel")
-async def on_pick_cancel(call: CallbackQuery):
+async def on_pick_cancel(call: CallbackQuery, state: FSMContext):
     try:
+        await state.clear()
         await call.message.delete()
     except TelegramBadRequest:
         pass

@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import Field, BaseModel, HttpUrl, field_validator, model_validator
 
+from schemas.group import GroupSchema
 from core.enums import ProgramLevel
 
 
@@ -229,6 +230,8 @@ class ProgramSchema(BaseModel):
                             examples=[True, False])
     
     version: int = Field(..., ge=1, title="Версия для оптимистической блокировки")
+    
+    groups: List[GroupSchema]
 
     model_config = {
         "from_attributes": True,

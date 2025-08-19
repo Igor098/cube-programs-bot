@@ -5,7 +5,7 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.security import ReplayError, TwaVerificationError, assert_not_replayed, verify_init_data
-from app.schemas.twa import TwaAuthIn
+from schemas.twa import TwaAuthIn
 from core.config import settings
 from core.token_types import TokenType
 from depends.redis_dep import get_redis

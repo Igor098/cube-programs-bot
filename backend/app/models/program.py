@@ -5,8 +5,6 @@ from sqlalchemy import CheckConstraint, String, Integer, Text, Boolean, Enum
 from core.enums import ProgramLevel
 from database.base import Base
 
-from sqlalchemy.orm import Mapped, mapped_column
-
 ProgramLevelDB = Enum(
     ProgramLevel,
     name="program_level",

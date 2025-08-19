@@ -12,7 +12,7 @@ class ProgramService:
         self._program_dao = ProgramDAO(session)
 
     async def get_programs(self):
-        programs = await self._program_dao.find_all()
+        programs = await self._program_dao.get_programs()
         if not programs:
             logger.warning("Программы не найдены")
             return []
@@ -20,7 +20,7 @@ class ProgramService:
         return programs
 
     async def get_program_by_id(self, program_id: int):
-        program = await self._program_dao.find_one_or_none_by_id(program_id)
+        program = await self._program_dao.get_program_by_id(program_id)
         if not program:
             logger.warning(f"Программа с id: {program_id} не найдена")
             raise NotFoundError(PROGRAM_NOT_FOUND)
@@ -28,7 +28,7 @@ class ProgramService:
         return program
 
     async def get_program_by_name(self, name: str):
-        program = await self._program_dao.find_one_or_none(ProgramFilter(name=name))
+        program = await self._program_dao.get_program_by_name(name)
         if not program:
             logger.warning(f"Программа с названием: {name} не найдена")
             raise NotFoundError(PROGRAM_NOT_FOUND)

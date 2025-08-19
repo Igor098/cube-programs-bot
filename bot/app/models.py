@@ -1,5 +1,21 @@
 from dataclasses import dataclass
-from typing import Literal, Optional
+from datetime import time
+from typing import List, Optional
+
+
+@dataclass
+class TimeSlot:
+    id: int
+    weekday: int
+    start_time: time
+    end_time: time
+
+
+@dataclass
+class Group:
+    id: int
+    name: str
+    time_slots: List[TimeSlot]
 
 
 @dataclass
@@ -9,12 +25,13 @@ class Program:
     description: str
     min_age: int
     max_age: int
-    category: str
     program_level: Optional[str]
     navigator_link: str
     requirements: Optional[str]
     image_url: Optional[str]
     is_active: bool
+    
+    groups: List[Group]
     
 
 @dataclass
