@@ -1,7 +1,7 @@
 from typing import List
 from pydantic import BaseModel, Field, field_validator
 
-from schemas.time_slot import TimeSlotSchema
+from app.schemas.time_slot import TimeSlotSchema
 
 
 class _GroupBaseValidator(BaseModel):

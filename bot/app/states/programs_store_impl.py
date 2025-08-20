@@ -1,6 +1,6 @@
 import asyncio
 from typing import Dict, List
-from models import ProgramWithId
+from app.models import ProgramWithId
 
 class ProgramStore:
     def __init__(self, page_size: int):

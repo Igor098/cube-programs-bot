@@ -1,8 +1,9 @@
 from html import escape as _escape
-from states.weekday import WEEKDAY
-from models import ProgramWithId
-from config import settings
 from loguru import logger
+
+from app.states.weekday import WEEKDAY
+from app.models import ProgramWithId
+from app.config import settings
 
 
 def _clamp(text: str, max_len: int) -> str:

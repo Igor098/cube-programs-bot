@@ -1,7 +1,7 @@
 from loguru import logger
-from exceptions.http import NotFoundException
-from crud.group import GroupDAO
-from core.error_messages import GROUP_NOT_FOUND
+from app.exceptions.http import NotFoundException
+from app.crud.group import GroupDAO
+from app.core.error_messages import GROUP_NOT_FOUND
 
 class GroupService:
     def __init__(self, session):

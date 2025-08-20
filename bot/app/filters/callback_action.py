@@ -1,6 +1,6 @@
 from aiogram.types import CallbackQuery
 from aiogram.filters import BaseFilter
-from utils.callback_data import CallbackPayload, InvalidCallbackPayload
+from app.utils.callback_data import CallbackPayload, InvalidCallbackPayload
 
 class ActionFilter(BaseFilter):
     """

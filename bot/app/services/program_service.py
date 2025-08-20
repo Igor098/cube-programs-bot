@@ -1,7 +1,8 @@
 from loguru import logger
-from utils.decorators import with_aiohttp_session
 from aiohttp import ClientSession, ClientConnectionError, ClientResponseError, ClientPayloadError, TooManyRedirects, InvalidURL, ClientConnectorError
 from asyncio import TimeoutError
+
+from app.utils.decorators import with_aiohttp_session
 
 @with_aiohttp_session
 async def get_programs_list(session: ClientSession) -> list[dict[str, str]]:
@@ -11,10 +12,11 @@ async def get_programs_list(session: ClientSession) -> list[dict[str, str]]:
     """
     try:
         async with session.get("programs") as response:
+            logger.info(f"Программы: {response}")
             response.raise_for_status()
             return await response.json()
-    except ClientConnectorError:
-        logger.error("Не удалось подключиться к серверу")
+    except ClientConnectorError as e:
+        logger.error(f"Не удалось подключиться к серверу. Ошибка: {e}")
         return []
     except ClientConnectionError as e:
         logger.error(f"Ошибка соединения: {e}")

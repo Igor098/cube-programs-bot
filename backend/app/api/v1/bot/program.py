@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from depends.session_dep import get_session_with_commit
-from depends.token_dep import get_current_bot_admin
-from exceptions.business import ConflictError, NotFoundError
-from exceptions.http import ConflictException, NotFoundException
-from models.admin import Admin
-from schemas.program import ProgramCreateSchema, ProgramUpdateSchema
-from services.program_service import ProgramService
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from app.depends.session_dep import get_session_with_commit
+from app.depends.token_dep import get_current_bot_admin
+from app.exceptions.business import ConflictError, NotFoundError
+from app.exceptions.http import ConflictException, NotFoundException
+from app.models.admin import Admin
+from app.schemas.program import ProgramCreateSchema, ProgramUpdateSchema
+from app.services.program_service import ProgramService
 
 bearer_scheme = HTTPBearer()
 

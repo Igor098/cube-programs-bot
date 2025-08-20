@@ -1,26 +1,26 @@
 from math import ceil
-from aiogram import F
 from loguru import logger
-from services.programs_sync import sync_programs_from_api
-from keyboards.main import main_keyboard
-from services.program_service import get_programs_list
-from tokens import get_token
-from keyboards.question import build_question_kb
-from keyboards.pick_age import kb_pick_age
-from keyboards.programs_by_age import build_programs_age_kb
-from states.pick_age import PickAge
-from services.file_service import get_enroll_blank
-from filters.callback_action import ActionFilter
-from keyboards.program import build_detail_kb, build_open_programs_kb, build_programs_kb
-from utils.formatters import build_enroll_message, build_enroll_question_message, build_list_message, build_pick_age_intro_html, format_program_caption_html, format_question_html
-from states.programs_store_impl import ProgramStore
-from utils.callback_data import CallbackPayload, InvalidCallbackPayload, encode_pick_return
+
+from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 
-from aiogram import Router
+from app.services.programs_sync import sync_programs_from_api
+from app.keyboards.main import main_keyboard
+from app.services.program_service import get_programs_list
+from app.tokens import get_token
+from app.keyboards.question import build_question_kb
+from app.keyboards.pick_age import kb_pick_age
+from app.keyboards.programs_by_age import build_programs_age_kb
+from app.states.pick_age import PickAge
+from app.services.file_service import get_enroll_blank
+from app.filters.callback_action import ActionFilter
+from app.keyboards.program import build_detail_kb, build_open_programs_kb, build_programs_kb
+from app.utils.formatters import build_enroll_message, build_enroll_question_message, build_list_message, build_pick_age_intro_html, format_program_caption_html, format_question_html
+from app.states.programs_store_impl import ProgramStore
+from app.utils.callback_data import CallbackPayload, InvalidCallbackPayload, encode_pick_return
 
 
 router = Router()

@@ -5,9 +5,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 from loguru import logger
 
-from models.group import Group
-from crud.base import BaseDAO
-from models.program import Program
+from app.models.group import Group
+from .base import BaseDAO
+from app.models.program import Program
 
 
 class ProgramDAO(BaseDAO):

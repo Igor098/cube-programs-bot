@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from utils.callback_data import encode_enroll, encode_list, encode_detail
-from utils.formatters import format_program_line
+from app.utils.callback_data import encode_enroll, encode_list, encode_detail
+from app.utils.formatters import format_program_line
 
 def _chunk(items, n):
     for i in range(0, len(items), n):

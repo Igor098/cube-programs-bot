@@ -3,21 +3,20 @@ from fastapi.requests import Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from core.security import ReplayError, TwaVerificationError, assert_not_replayed, verify_init_data
-from schemas.twa import TwaAuthIn
-from core.config import settings
-from core.token_types import TokenType
-from depends.redis_dep import get_redis
-from depends.session_dep import get_session_with_commit
-from depends.token_dep import get_current_bot_admin
-from exceptions.business import ConflictError, NotFoundError
-from exceptions.http import ConflictException, NotFoundException, UnauthorizedException
-from models import Admin
-from schemas.admin import AdminCreateSchema, AdminTelegramSchema, AdminSchema
-from services.admin_service import AdminService
-
 from loguru import logger
+
+from app.core.security import ReplayError, TwaVerificationError, assert_not_replayed, verify_init_data
+from app.schemas.twa import TwaAuthIn
+from app.core.config import settings
+from app.core.token_types import TokenType
+from app.depends.redis_dep import get_redis
+from app.depends.session_dep import get_session_with_commit
+from app.depends.token_dep import get_current_bot_admin
+from app.exceptions.business import ConflictError, NotFoundError
+from app.exceptions.http import ConflictException, NotFoundException, UnauthorizedException
+from app.models import Admin
+from app.schemas.admin import AdminCreateSchema, AdminTelegramSchema, AdminSchema
+from app.services.admin_service import AdminService
 
 router = APIRouter(prefix="/v1/bot/admin", tags=["Администрирование через бота"])
 

@@ -1,11 +1,14 @@
 import asyncio
+
 from aiogram import Dispatcher, Bot
 from aiogram.client.default import DefaultBotProperties
-from services.programs_sync import sync_programs_from_api
-from config import settings
+
 from loguru import logger
-from handlers import common_router, programs_router, authentication_router
-from states.programs_store import store
+
+from app.services.programs_sync import sync_programs_from_api
+from app.config import settings
+from app.handlers import common_router, programs_router, authentication_router
+from app.states.programs_store import store
 
 
 async def on_startup(bot: Bot):

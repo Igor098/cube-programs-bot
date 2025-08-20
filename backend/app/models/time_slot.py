@@ -5,7 +5,7 @@ from sqlalchemy import CheckConstraint, SmallInteger, Time, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.schema import ForeignKey
 
-from database.base import Base
+from app.database.base import Base
 
 class TimeSlot(Base):
     __tablename__ = "time_slots"

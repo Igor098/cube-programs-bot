@@ -1,7 +1,6 @@
-import os
 from fastapi import APIRouter
-from pathlib import Path
 from fastapi.responses import FileResponse
+from pathlib import Path
 
 
 router = APIRouter(prefix="/v1/files", tags=["Файлы"])

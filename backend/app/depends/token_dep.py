@@ -4,15 +4,15 @@ from loguru import logger
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.error_messages import TOKEN_NOT_FOUND, TOKEN_NOT_VALID, CSRF_NOT_FOUND, CSRF_NOT_VALID
-from core.security import decode_token
-from core.token_types import TokenType
-from depends.redis_dep import get_redis
-from depends.session_dep import get_session_with_commit
-from exceptions.business import TokenNotFoundError
-from exceptions.http import UnauthorizedException
-from models.admin import Admin
-from services.admin_service import AdminService
+from app.core.error_messages import TOKEN_NOT_FOUND, TOKEN_NOT_VALID, CSRF_NOT_FOUND, CSRF_NOT_VALID
+from app.core.security import decode_token
+from app.core.token_types import TokenType
+from app.depends.redis_dep import get_redis
+from app.depends.session_dep import get_session_with_commit
+from app.exceptions.business import TokenNotFoundError
+from app.exceptions.http import UnauthorizedException
+from app.models.admin import Admin
+from app.services.admin_service import AdminService
 
 
 def get_admin_service(

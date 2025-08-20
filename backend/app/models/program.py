@@ -2,8 +2,8 @@ from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import CheckConstraint, String, Integer, Text, Boolean, Enum
 
-from core.enums import ProgramLevel
-from database.base import Base
+from app.core.enums import ProgramLevel
+from app.database.base import Base
 
 ProgramLevelDB = Enum(
     ProgramLevel,

@@ -1,7 +1,8 @@
 from aiohttp import ClientConnectionError, ClientConnectorError, ClientPayloadError, ClientResponseError, ClientSession, InvalidURL, TooManyRedirects
 from loguru import logger
-from utils.decorators import with_aiohttp_session
 from aiogram.types import BufferedInputFile
+
+from app.utils.decorators import with_aiohttp_session
 
 @with_aiohttp_session
 async def get_enroll_blank(session: ClientSession) -> list[dict[str, str]]:

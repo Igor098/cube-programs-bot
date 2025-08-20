@@ -1,8 +1,10 @@
 from math import ceil
 from typing import List, TypeAlias
-from utils.callback_data import encode_detail, encode_list, encode_pick_page
-from models import ProgramWithId
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+from app.utils.callback_data import encode_detail, encode_list, encode_pick_page
+from app.models import ProgramWithId
 
 
 AGE_RESULTS_LIMIT = 10

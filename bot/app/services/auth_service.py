@@ -4,7 +4,7 @@ from typing import Optional
 from aiohttp import ClientSession, ClientConnectionError, ClientResponseError, ClientPayloadError, TooManyRedirects, InvalidURL, ClientConnectorError
 from loguru import logger
 
-from utils.decorators import with_aiohttp_session
+from app.utils.decorators import with_aiohttp_session
 
 
 @with_aiohttp_session

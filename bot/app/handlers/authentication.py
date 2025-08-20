@@ -4,9 +4,9 @@ from aiogram.types import Message
 from aiogram.filters import Command
 from loguru import logger
 
-from keyboards.main import main_keyboard
-from tokens import AccessTokenData, get_token, user_tokens
-from services.auth_service import login, profile as get_profile
+from app.keyboards.main import main_keyboard
+from app.tokens import AccessTokenData, get_token, user_tokens
+from app.services.auth_service import login, profile as get_profile
 
 
 router = Router()

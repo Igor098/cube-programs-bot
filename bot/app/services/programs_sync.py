@@ -1,8 +1,8 @@
 from datetime import time
 from loguru import logger
 from typing import Any, List, Optional
-from states.programs_store import store
-from models import ProgramWithId, Group, TimeSlot
+from app.states.programs_store import store
+from app.models import ProgramWithId, Group, TimeSlot
 from .program_service import get_programs_list
 
 
@@ -107,6 +107,7 @@ async def sync_programs_from_api() -> tuple[int, str]:
     Может кинуть ValueError, если данные кривые.
     """
     data = await get_programs_list()  # [] при сетевой ошибке
+    print("data:", data)
     if not data:
         msg = "Каталог не обновлён: API вернул пустой список или была сетевая ошибка"
         logger.warning(msg)

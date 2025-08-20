@@ -3,10 +3,11 @@ from aiogram import Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
-from tokens import get_token
-from filters.chat_type import ChatTypeFilter
-from keyboards.main import main_keyboard
 from loguru import logger
+
+from app.tokens import get_token
+from app.filters.chat_type import ChatTypeFilter
+from app.keyboards.main import main_keyboard
 
 
 router = Router()

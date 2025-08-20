@@ -1,5 +1,5 @@
 from redis.asyncio import Redis
-from core.config import settings
+from app.core.config import settings
 
 redis_host = settings.REDIS_HOST
 redis_port = int(settings.REDIS_PORT)

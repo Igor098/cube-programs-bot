@@ -2,13 +2,9 @@ from typing import List, Optional
 
 from pydantic import Field, BaseModel, HttpUrl, field_validator, model_validator
 
-from schemas.group import GroupSchema
-from core.enums import ProgramLevel
-
-
-from typing import Optional
-from pydantic import BaseModel, Field, HttpUrl, field_validator, model_validator
-from core.enums import ProgramLevel
+from app.schemas.group import GroupSchema
+from app.core.enums import ProgramLevel
+from app.core.enums import ProgramLevel
 
 
 class _BaseProgramValidators(BaseModel):

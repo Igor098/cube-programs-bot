@@ -2,7 +2,7 @@ from functools import wraps
 from typing import Any, Awaitable, Callable
 
 from aiohttp import ClientSession, ClientTimeout
-from config import settings
+from app.config import settings
 
 def with_aiohttp_session(func: Callable[..., Awaitable[Any]]):
     @wraps(func)
