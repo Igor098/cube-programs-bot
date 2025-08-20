@@ -25,13 +25,15 @@ def build_programs_kb(items, page, pages, ver, cols: int = 1) -> InlineKeyboardM
     if page < pages - 1:
         nav.append(InlineKeyboardButton(text="➡️ Далее", callback_data=encode_list(page + 1, ver)))
     rows.append(nav)
+    rows.append([InlineKeyboardButton(text="❌ Отмена", callback_data="pick:cancel")])
 
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
 def build_open_programs_kb(version: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="📋 Открыть список программ", callback_data=encode_list(0, version))]
+        [InlineKeyboardButton(text="📋 Открыть список программ", callback_data=encode_list(0, version))],
+        [InlineKeyboardButton(text="❌ Отмена", callback_data="pick:cancel")]
     ])
 
 

@@ -1,13 +1,18 @@
 from math import ceil
 from aiogram import F
 from loguru import logger
+from services.programs_sync import sync_programs_from_api
+from keyboards.main import main_keyboard
+from services.program_service import get_programs_list
+from tokens import get_token
+from keyboards.question import build_question_kb
 from keyboards.pick_age import kb_pick_age
 from keyboards.programs_by_age import build_programs_age_kb
 from states.pick_age import PickAge
 from services.file_service import get_enroll_blank
 from filters.callback_action import ActionFilter
 from keyboards.program import build_detail_kb, build_open_programs_kb, build_programs_kb
-from utils.formatters import build_enroll_message, build_enroll_question_message, build_list_message, build_pick_age_intro_html, format_program_caption_html
+from utils.formatters import build_enroll_message, build_enroll_question_message, build_list_message, build_pick_age_intro_html, format_program_caption_html, format_question_html
 from states.programs_store_impl import ProgramStore
 from utils.callback_data import CallbackPayload, InvalidCallbackPayload, encode_pick_return
 from aiogram.types import Message, CallbackQuery
@@ -78,6 +83,11 @@ async def handle_show_programs(message: Message, store: ProgramStore, state: FSM
     kb = build_programs_kb(items, page, pages, ver, cols=1)
 
     await message.answer(start_text, parse_mode="HTML", reply_markup=kb)
+    try:
+        await message.delete()
+    except Exception as e:
+        logger.error(f"Не удалось удалить сообщение. Ошибка: {e}")
+        pass
     
 
 @router.message(F.text.contains("Как записаться"))
@@ -94,6 +104,11 @@ async def handle_enroll_question(message: Message, store: ProgramStore, state: F
         reply_markup=kb,
         disable_web_page_preview=True
         )
+    try:
+        await message.delete()
+    except Exception as e:
+        logger.error(f"Не удалось удалить сообщение. Ошибка: {e}")
+        pass
     
     
 @router.message(F.text.contains("Подобрать программу"))
@@ -109,10 +124,56 @@ async def handle_enroll_question(message: Message, state: FSMContext):
         reply_markup=kb,
         disable_web_page_preview=True
         )
+    try:
+        await message.delete()
+    except Exception as e:
+        logger.error(f"Не удалось удалить сообщение. Ошибка: {e}")
+        pass
+    
+    
+@router.message(F.text.contains("Задать вопрос"))
+async def handle_ask_question(message: Message, state: FSMContext):
+    text = format_question_html()
+    kb = build_question_kb()
+    
+    await state.clear()
+    await message.answer(
+        text,
+        parse_mode="HTML",
+        reply_markup=kb
+    )
+    try:
+        await message.delete()
+    except Exception as e:
+        logger.error(f"Не удалось удалить сообщение. Ошибка: {e}")
+        pass
+    
+
+@router.message(F.text.contains("Обновить список программ"))
+async def handle_ask_question(message: Message, store: ProgramStore, state: FSMContext):
+    token = get_token(message.from_user.id)
+    is_admin = True if token else False
+    if not is_admin:
+        await message.answer("Вы не авторизованы в системе или закончилось время авторизации. Для повторной авторизации используйте команду: /login", parse_mode="HTML")
+        return
+    
+    _, msg = await sync_programs_from_api()
+    
+    await state.clear()
+    await message.answer(
+        msg,
+        parse_mode="HTML",
+        reply_markup=main_keyboard(is_admin=is_admin)
+    )
+    try:
+        await message.delete()
+    except Exception as e:
+        logger.error(f"Не удалось удалить сообщение. Ошибка: {e}")
+        pass
     
 
 @router.callback_query(ActionFilter("list"))
-async def on_cb(call: CallbackQuery, store: ProgramStore):
+async def on_cb(call: CallbackQuery, store: ProgramStore, state: FSMContext):
     try:
         logger.info(f"Разбор колбэка списка: {call.data}")
         payload = CallbackPayload.parse(call.data)
@@ -120,7 +181,7 @@ async def on_cb(call: CallbackQuery, store: ProgramStore):
         logger.error(f"Ошибка разбора данных колбэка: {e}")
         await call.answer("Кнопка устарела или повреждена", show_alert=True)
         return
-
+    await state.clear()
     current = await store.get_version()
     page = max(0, payload.page or 0)
 
@@ -338,5 +399,5 @@ async def on_pick_cancel(call: CallbackQuery, state: FSMContext):
         await call.message.delete()
     except TelegramBadRequest:
         pass
-    await call.answer("Подбор отменён")
+    await call.answer("Отмена")
         

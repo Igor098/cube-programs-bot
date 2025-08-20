@@ -84,7 +84,7 @@ async def auth_twa(
         access_token=token,
         token_type=TokenType.BOT,
         expires_in=settings.BOT_TTL,
-    )
+    )   
 
 @router.post("/login")
 async def login(

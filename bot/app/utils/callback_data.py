@@ -74,19 +74,15 @@ class CallbackPayload:
             return cls(action=action, page=page, program_id=program_id, version=version)
 
 def encode_list(page, ver):
-    print(f"list encode: {page}, {ver}")
     return f"list|{page}|-|{ver}"
 
 def encode_detail(page, program_id, ver):
-    print(f"detail encode: {page}, {program_id}, {ver}")
     return f"detail|{page}|{program_id}|{ver}"
 
 def encode_enroll(page: int, program_id: int, version: int) -> str:
-    print(f"enroll encode: {page}, {program_id}, {version}")
     return f"enroll|{page}|{program_id}|{version}"
 
 def encode_pick(age: int, version: int) -> str:
-    print(f"enroll encode: {age}, {version}")
     return f"pick|age|{age}|{version}"
 
 def encode_pick_page(age: int, page: int, ver: int) -> str:

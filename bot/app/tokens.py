@@ -17,6 +17,7 @@ def get_token(telegram_id: int) -> str | None:
     now = datetime.now(timezone.utc)
     
     if token_data and token_data.expires_at > now:
-        logg
         return token_data.access_token
+    else:
+        user_tokens.pop(telegram_id, None)
     return None

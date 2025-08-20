@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     ORGANIZATION_ADDRESS: str
     WORK_SHEDULE: str
     NAVIGATOR_LINK: str
+    CHANNEL_URL: str
+    CHANNEL_NAME: str
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "../", ".env")

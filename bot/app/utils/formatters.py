@@ -143,3 +143,10 @@ def format_program_caption_html(p: ProgramWithId) -> str:
     parts.append(requirements)
 
     return "\n".join(parts)
+
+
+def format_question_html() -> str:
+    return f"Привет! Если остались вопросы по программам, расписанию или записи — мы с радостью поможем в <b>{settings.CHANNEL_NAME}</b>. Напишите, и мы подскажем, что выбрать и как записаться."
+
+def build_update_programs_message():
+    return "Список программ успешно обновлен."
