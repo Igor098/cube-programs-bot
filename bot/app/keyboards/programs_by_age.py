@@ -5,14 +5,12 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from app.utils.callback_data import encode_detail, encode_list, encode_pick_page
 from app.models import ProgramWithId
+from app.utils.formatters import format_program_line
 
 
 AGE_RESULTS_LIMIT = 10
 Rows: TypeAlias = List[List[InlineKeyboardButton]]
 
-def _short(text: str, limit: int = 48) -> str:
-    clean = " ".join(str(text).split())
-    return clean if len(clean) <= limit else clean[:limit - 1] + "…"
 
 def build_programs_age_manage_rows(version: int) -> Rows:
     return [
@@ -42,8 +40,7 @@ def build_programs_age_kb(
 
     rows: list[list[InlineKeyboardButton]] = []
     for p in slice_:
-        title = _short(getattr(p, "name", f"Программа #{p.id}"))
-        rows.append([InlineKeyboardButton(text=title, callback_data=encode_detail(page, p.id, version))])
+        rows.append([InlineKeyboardButton(text=format_program_line(p), callback_data=encode_detail(page, p.id, version))])
 
     # Навигация
     nav: list[InlineKeyboardButton] = []

@@ -150,11 +150,16 @@ async def handle_ask_question(message: Message, state: FSMContext):
     
 
 @router.message(F.text.contains("Обновить список программ"))
-async def handle_ask_question(message: Message, store: ProgramStore, state: FSMContext):
+async def handle_ask_question(message: Message, state: FSMContext):
     token = get_token(message.from_user.id)
     is_admin = True if token else False
     if not is_admin:
         await message.answer("Вы не авторизованы в системе или закончилось время авторизации. Для повторной авторизации используйте команду: /login", parse_mode="HTML")
+        try:
+            await message.delete()
+        except Exception as e:
+            logger.error(f"Не удалось удалить сообщение. Ошибка: {e}")
+            pass
         return
     
     _, msg = await sync_programs_from_api()
